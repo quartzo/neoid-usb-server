@@ -58,15 +58,21 @@ def service_worker():
 
 def move_to_preset(handler):
     key = urllib.parse.unquote(handler.path[4:]).split('/')
-    ncamera = key[0]
-    npreset = key[1] if len(key)>1 else '1'
+    try:
+        ncamera = int(key[0])
+    except:
+        ncamera = 1
+    try:
+        npreset = int(key[1])
+    except:
+        npreset = 1
     dlg = pywinauto.Desktop(backend="win32")["NEOiD Câmera PRO"]
     camera = dlg.child_window(auto_id='comboBoxCameraSelect')
-    #camera.select(camera)
+    #camera.select(camera.item_texts[ncamera])
     grupos = dlg.child_window(auto_id='comboBoxGrupos')
     #grupos.print_control_identifiers()
-    grupos.select('Grupo '+ncamera)
-    dlg.child_window(auto_id='button'+npreset).click()
+    grupos.select(grupos.item_texts[ncamera-1])
+    dlg.child_window(auto_id='button'+str(npreset)).click()
     return 'OK'
 
 routes = {
