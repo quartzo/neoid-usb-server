@@ -1,5 +1,4 @@
 import obspython as S
-import json
 import pywinauto
 
 def script_description():
@@ -67,7 +66,6 @@ def script_update(_settings):
       scene_camera_split = splitnum(scene_camera)
       settings[scene_name] = scene_camera_split
   S.source_list_release(scenes)
-  S.script_log(S.LOG_INFO, "Settings " + json.dumps(settings))
 
 def handle_scene_change():
   scene_prev = S.obs_frontend_get_current_preview_scene()
