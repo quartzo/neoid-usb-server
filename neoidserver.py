@@ -67,11 +67,11 @@ def move_to_preset(handler):
     except:
         npreset = 1
     dlg = pywinauto.Desktop(backend="win32")["NEOiD Câmera PRO"]
-    camera = dlg.child_window(auto_id='comboBoxCameraSelect')
+    #camera = dlg.child_window(auto_id='comboBoxCameraSelect')
     #camera.select(camera.item_texts[ncamera])
-    grupos = dlg.child_window(auto_id='comboBoxGrupos')
+    #grupos = dlg.child_window(auto_id='comboBoxGrupos')
     #grupos.print_control_identifiers()
-    grupos.select(grupos.item_texts[ncamera-1])
+    #grupos.select(grupos.item_texts[ncamera-1])
     dlg.child_window(auto_id='button'+str(npreset)).click()
     return 'OK'
 
