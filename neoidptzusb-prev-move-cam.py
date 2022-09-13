@@ -85,4 +85,4 @@ def handle_scene_change():
   else:
     valuecmd = str(scene_prev_camera_split[0]) + "/" + str(scene_prev_camera_split[1])
     S.script_log(S.LOG_INFO, "Ativando " + scene_prev_name + ". Executando comando:  " + valuecmd)
-    urllib.request.urlopen("http://localhost:7777/api/neoid/Preset%20"+str(scene_prev_camera_split[2])).read()
+    urllib.request.urlopen("http://localhost:7777/api/neoid/Preset%20"+str(scene_prev_camera_split[1])).read()
