@@ -61,11 +61,13 @@ function handle_scene_change()
 	local scene_prev_name = obs.obs_source_get_name(scene_prev)
 	local scene_prev_camera = obs.obs_data_get_string(settings, "scene_camera_" .. scene_prev_name)
   local scene_prev_camera_split = splitnum(scene_prev_camera)
+	obs.obs_source_release(scene_prev)
 
 	local scene_current = obs.obs_frontend_get_current_scene()
 	local scene_current_name = obs.obs_source_get_name(scene_current)
 	local scene_current_camera = obs.obs_data_get_string(settings, "scene_camera_" .. scene_current_name)
 	local scene_current_camera_split = splitnum(scene_current_camera)
+	obs.obs_source_release(scene_current)
 
 	if (scene_prev_camera_split[2] or 0) == 0 then
 		obs.script_log(obs.LOG_INFO, "Ativando " .. scene_prev_name .. ". Faz nada: Câmera sem preset")
@@ -77,5 +79,4 @@ function handle_scene_change()
 		obs.script_log(obs.LOG_INFO, "Ativando " .. scene_prev_name .. ". Executando comando:  " .. valuecmd)
 		os.execute(command)
 	end
-	obs.obs_source_release(scene);
 end

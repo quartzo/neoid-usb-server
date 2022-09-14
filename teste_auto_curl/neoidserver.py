@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+# fazer: pip install pywinauto
 '''
 Em  comando:
     curl  http://localhost:7777/mp/5/SCENE_VALUE

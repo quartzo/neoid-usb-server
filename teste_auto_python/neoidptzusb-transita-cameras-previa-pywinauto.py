@@ -1,3 +1,4 @@
+# fazer: pip install pywinauto
 import obspython as S
 import pywinauto
 
