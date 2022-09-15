@@ -80,7 +80,7 @@ def handle_scene_change():
     S.script_log(S.LOG_INFO, log + "Executando comando:  " + valuecmd)
     url = "http://localhost:7777/api/neoid/Preset%20"+str(prev_cam_data["preset"])
     try:
-      urllib.request.urlopen(url).read()
+      urllib.request.urlopen(url, timeout=1).read()
     except:
       S.script_log(S.LOG_INFO, log + "Falha requisição web NEOID: " + url)
 
