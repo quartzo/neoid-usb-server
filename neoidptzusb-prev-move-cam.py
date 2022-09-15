@@ -74,7 +74,16 @@ def handle_scene_change():
   if prev_cam_data["preset"] == 0:
     S.script_log(S.LOG_INFO, log+"Faz nada: Câmera sem preset")
   elif prev_cam_data["cam"] == current_cam_data["cam"]:
-    S.script_log(S.LOG_INFO, log + "Faz nada: Câmera ativa não pode mover")
+    if prev_cam_data["preset"] == current_cam_data["preset"]:
+      pass #S.script_log(S.LOG_INFO, log + "Faz nada: Preview igual corrente")
+    else:
+      S.script_log(S.LOG_INFO, log + "Desfaz: Preview volta para corrente")
+      def undo():
+        scene_current = S.obs_frontend_get_current_scene()
+        S.obs_frontend_set_current_preview_scene(scene_current)
+        S.obs_source_release(scene_current)
+        S.remove_current_callback()
+      S.timer_add(undo, 50)
   else:
     valuecmd = str(prev_cam_data["cam"]) + "/" + str(prev_cam_data["preset"])
     S.script_log(S.LOG_INFO, log + "Executando comando:  " + valuecmd)
