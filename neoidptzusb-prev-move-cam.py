@@ -19,13 +19,17 @@ Será executato:
 	-- câmera com preset: "1/2" -> câmera 1 preset 2 -> envia comando
 	"""
 
-def script_load(settings):
-  S.script_log(S.LOG_INFO, "script_load")
-  #S.obs_frontend_add_event_callback(handle_event)
+settings = {}
+
+def script_load(_settings):
+  #S.script_log(S.LOG_INFO, "script_load")
+  global settings
+  settings = _settings
   S.obs_frontend_add_event_callback(on_event)
 
 def script_unload():
-	S.script_log(S.LOG_INFO, "script_unload")
+  pass
+	#S.script_log(S.LOG_INFO, "script_unload")
 
 def on_event(event):
   if event == S.OBS_FRONTEND_EVENT_PREVIEW_SCENE_CHANGED:
@@ -41,48 +45,42 @@ def script_properties():
   S.source_list_release(scenes)
   return props
 
-settings = {}
-
-def splitnum(str):
-	res = str.split("/")
-	try:
-		cam = int(res[0])
-	except:
-		cam = 0
-	try:
-		preset = int(res[1])
-	except:
-		preset = 0
-	return [cam,preset]
-
 def script_update(_settings):
   global settings
-  settings = {}
-  scenes = S.obs_frontend_get_scenes()
-  if scenes:
-    for scene in scenes:
-      scene_name = S.obs_source_get_name(scene)
-      scene_camera = S.obs_data_get_string(_settings, "scene_camera_" + scene_name)
-      scene_camera_split = splitnum(scene_camera)
-      settings[scene_name] = scene_camera_split
-  S.source_list_release(scenes)
+  settings = _settings
+
+def get_scene_camera_split(scene):
+  scene_name = S.obs_source_get_name(scene)
+  scene_camera = S.obs_data_get_string(settings, "scene_camera_" + scene_name)
+  split = scene_camera.split("/")
+  res = { "cam": 0, "preset": 0, "scene_name": scene_name }
+  try: 
+    res["cam"] = int(split[0])
+    res["preset"] = int(split[1])
+  except:
+    pass
+  return res
 
 def handle_scene_change():
   scene_prev = S.obs_frontend_get_current_preview_scene()
-  scene_prev_name = S.obs_source_get_name(scene_prev)
-  scene_prev_camera_split = settings[scene_prev_name]
+  prev_cam_data = get_scene_camera_split(scene_prev)
   S.obs_source_release(scene_prev)
 
   scene_current = S.obs_frontend_get_current_scene()
-  scene_current_name = S.obs_source_get_name(scene_current)
-  scene_current_camera_split = settings[scene_current_name]
+  current_cam_data = get_scene_camera_split(scene_current)
   S.obs_source_release(scene_current)
 
-  if scene_prev_camera_split[1] == 0:
-    S.script_log(S.LOG_INFO, "Ativando " + scene_prev_name + ". Faz nada: Câmera sem preset")
-  elif scene_prev_camera_split[0] == scene_current_camera_split[0]:
-    S.script_log(S.LOG_INFO, "Ativando " + scene_prev_name + ". Faz nada: Câmera ativa não pode mover")
+  log = "Ativando " + prev_cam_data["scene_name"] + ". "
+  if prev_cam_data["preset"] == 0:
+    S.script_log(S.LOG_INFO, log+"Faz nada: Câmera sem preset")
+  elif prev_cam_data["cam"] == current_cam_data["cam"]:
+    S.script_log(S.LOG_INFO, log + "Faz nada: Câmera ativa não pode mover")
   else:
-    valuecmd = str(scene_prev_camera_split[0]) + "/" + str(scene_prev_camera_split[1])
-    S.script_log(S.LOG_INFO, "Ativando " + scene_prev_name + ". Executando comando:  " + valuecmd)
-    urllib.request.urlopen("http://localhost:7777/api/neoid/Preset%20"+str(scene_prev_camera_split[1])).read()
+    valuecmd = str(prev_cam_data["cam"]) + "/" + str(prev_cam_data["preset"])
+    S.script_log(S.LOG_INFO, log + "Executando comando:  " + valuecmd)
+    url = "http://localhost:7777/api/neoid/Preset%20"+str(prev_cam_data["preset"])
+    try:
+      urllib.request.urlopen(url).read()
+    except:
+      S.script_log(S.LOG_INFO, log + "Falha requisição web NEOID: " + url)
+
